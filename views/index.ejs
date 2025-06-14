@@ -1,0 +1,107 @@
+<%- include("partials/header.ejs") %>
+
+ <!--section 1-->
+    
+ <div class="section1 container-fluid main ">
+
+  <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
+      <ol class="carousel-indicators">
+        <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
+        <li data-target="#carouselExampleIndicators" data-slide-to="1"></li>
+        <li data-target="#carouselExampleIndicators" data-slide-to="2"></li>
+       </ol>
+      <div class="carousel-inner">
+        <div class="carousel-item active">
+          <img class="d-block w-100" src="images/slide 2.jpeg" alt="First slide">
+          <div class="gradient-overlay"></div>
+          <div class="container text-position">
+            <div class="container position-absolute top-50 custom-start-20 translate-middle-y text-white ps-5">
+                <h1>Example headline.</h1>
+                <p class="opacity-75">Some representative placeholder content for the first slide of the carousel.</p>
+                <p><a class="btn btn-lg btn-primary btn-sm" href="#">Sign up today</a></p>
+              </div>
+            </div>
+        </div>
+        <div class="carousel-item ">
+          <img class="d-block w-100" src="images/gym6.jpg" alt="Second slide">
+          <div class="gradient-overlay"></div>
+          <div class="container position-absolute top-50 custom-start-20 translate-middle-y text-white ps-5">
+            <h1>Upgrade Your Business Look</h1>
+            <p>Premium suits, stylish footwear, and accessories that make a statement.</p>
+            <a class="btn btn-primary btn-sm" href="#">Learn more</a>
+          </div>
+        </div>
+
+      <div class="carousel-item">
+        <img class="d-block w-100" src="images/tech1.jpg" alt="Third slide">
+        <div class="gradient-overlay"></div>
+        <div class="container">
+          <div class="container position-absolute top-50 custom-start-20 translate-middle-y text-white ps-5">
+              <h1>Another example headline.</h1>
+              <p>Some representative placeholder content for the second slide of the carousel.</p>
+              <p><a class="btn btn-lg btn-primary btn-sm" href="#">Learn more</a></p>
+            </div>
+          </div>
+    </div>
+
+    
+      </div>
+      <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="sr-only">Previous</span>
+      </a>
+      <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="sr-only">Next</span>
+      </a>
+    </div>
+</div>
+
+<!--section 2-->
+<!-- Example of dynamic category section using EJS -->
+<div class="section2">
+  <% const mainCategories = [
+  { name: 'Fashion', imgFront: 'fashion.jpg', imgBack: 'fashion2.jpg', description: 'Explore Styles' },
+  { name: 'Mobile Accessories', imgFront: 'accessories.jpg', imgBack: 'accessories2.jpg', description: 'Explore Beauty' },
+  { name: 'Art & Stationery', imgFront: 'art.jpg', imgBack: 'art2.jpg', description: 'Explore the beauty of art' },
+  { name: 'Automobiles & Accessories', imgFront: 'car.jpg', imgBack: 'car2.jpg', description: 'Explore new rides' },
+  { name: 'Electronics', imgFront: 'electronics.jpg', imgBack: 'electronics2.jpg', description: 'Get electrical appliances now' },
+  { name: 'Health & Beauty', imgFront: 'health2.jpg', imgBack: 'health.jpg', description: 'Get healthy skincare' },
+  { name: 'Home & Kitchen', imgFront: 'home equipment.jpg', imgBack: 'home euqipment2.jpg', description: 'Explore new home equipments' },
+  { name: 'Toys, Kids & Babies', imgFront: 'mobile.jpg', imgBack: 'mobile2.jpg', description: 'Explore new mobile phones' },
+  { name: 'Sports & Outdoors', imgFront: 'sport.jpg', imgBack: 'sport2.jpg', description: 'Explore sports wear and gym equipment' }
+];
+; %>
+
+  <% mainCategories.forEach(cat => { %>
+    <div class="section2-icon">
+      <a href="/category/<%= encodeURIComponent(cat.name) %>">
+        <div class="flip-card">
+          <div class="flip-card-inner">
+            <div class="flip-card-front">
+              <img src="images/<%= cat.imgFront %>" alt="<%= cat.name %>" class="category-icon">
+              <p class="category-name"><%= cat.name %></p>
+            </div>
+            <div class="flip-card-back">
+              <img src="images/<%= cat.imgBack %>" alt="<%= cat.name %> back" class="category-icon">
+              <p class="category-name"><%= cat.description %></p>
+            </div>
+          </div>
+        </div>
+      </a>
+    </div>
+  <% }) %>
+</div>
+
+
+<!--section3-->
+
+<div class="section3 container-fluid">
+  <img src="images/business.jpg" alt="business" width="100%" height="500px">
+  <div class="section3-text text-dark">
+    <h3>HOW TO SAVE</h3>
+    <p>we ensure that your money is safe with us in your account by the company. we care about our customers and make sure there are comfortable with us</p>
+  </div>
+</div>
+
+<%- include("partials/footer.ejs") %>

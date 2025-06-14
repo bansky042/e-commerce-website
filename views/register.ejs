@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register</title>
+
+  <!-- Inline Styling for Professional Design -->
+  <style>
+    * {
+      box-sizing: border-box;
+      padding: 0;
+      margin: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f7fc;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 60px auto;
+      padding: 30px;
+      background-color: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      text-align: center;
+      font-size: 28px;
+      margin-bottom: 10px;
+      color: #333;
+    }
+
+    p.description {
+      text-align: center;
+      margin-bottom: 25px;
+      font-size: 14px;
+    }
+
+    .success-message {
+      text-align: center;
+      margin-bottom: 20px;
+      color: green;
+      font-weight: 500;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+      color: #444;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 14px;
+      transition: border-color 0.3s ease;
+    }
+
+    .form-control:focus {
+      border-color: #007bff;
+      outline: none;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      background-color: navy;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .btn:hover {
+      background-color: red;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        margin: 30px 15px;
+        padding: 25px;
+      }
+
+      h2 {
+        font-size: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    
+
+    <!-- Title & Login Prompt -->
+    <h2>REGISTER</h2>
+    <p class="description">
+      Already have an account? <a href="/login">Login</a>
+    </p>
+
+    <!-- Registration Form -->
+    <form action="/register" method="POST">
+      <!-- Hidden referral code for backend -->
+      
+      <!-- Full Name -->
+      <div class="form-group">
+        <label for="fullname">Full Name</label>
+        <input type="text" class="form-control" name="fullname" placeholder="Enter your full name" required />
+      </div>
+
+      <!-- Username -->
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" class="form-control" name="username" placeholder="Choose a username" required />
+      </div>
+
+      <!-- Email -->
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input type="email" class="form-control" name="email" placeholder="Enter your email address" required />
+      </div>
+
+      <!-- Password -->
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" class="form-control" name="password" placeholder="Create a password" required />
+      </div>
+
+      <!-- Confirm Password -->
+      <div class="form-group">
+        <label for="confirmPassword">Confirm Password</label>
+        <input type="password" class="form-control" name="confirmPassword" placeholder="Repeat your password" required />
+      </div>
+
+      <!-- Phone Number -->
+      <div class="form-group">
+        <label for="phoneNumber">Phone Number</label>
+        <input type="tel" class="form-control" name="phoneNumber" placeholder="Enter your phone number" required />
+      </div>
+        
+      <!-- Address -->
+    <div class="form-group">
+        <label for="address" class="form-label">Address</label>
+        <input type="text" name="address" class="form-control">
+      </div>
+
+        <!-- City -->
+    <div class="form-group">
+        <label for="city" class="form-label">City</label>
+        <input type="text" name="city" class="form-control">
+      </div>
+
+        <!-- State -->
+      <div class="form-group">
+        <label for="state" class="form-label">State</label>
+        <input type="text" name="state" class="form-control">
+      </div>
+
+        <!-- Postal Code -->
+      <div class="form-group">
+        <label for="postal_code" class="form-label">Postal Code</label>
+        <input type="text" name="postal_code" class="form-control">
+      </div>
+
+
+      <!-- Country Selection -->
+      <div class="form-group">
+        <label for="country">Country</label>
+        <select class="form-control" name="country" required>
+          <option value="" disabled selected>Select your country</option>
+          <% const countries = [
+            "USA", "Canada", "UK", "Australia", "Germany", "France", "Italy", "Spain", "India", "China", "Japan",
+            "Brazil", "Mexico", "Russia", "South Africa", "Netherlands", "Sweden", "Norway", "Finland", "Denmark",
+            "Belgium", "Austria", "Switzerland", "New Zealand", "Singapore", "Malaysia", "Philippines", "Thailand",
+            "Vietnam", "South Korea", "Israel", "Saudi Arabia", "United Arab Emirates", "Egypt", "Nigeria", "Kenya",
+            "Argentina", "Chile", "Colombia", "Peru", "Iceland", "Ireland", "Portugal", "Czech Republic", "Hungary",
+            "Slovakia", "Croatia", "Slovenia", "Lithuania", "Latvia", "Estonia", "Malta", "Cyprus", "Luxembourg",
+            "Monaco", "Andorra", "Liechtenstein", "San Marino", "Vatican City"
+          ]; %>
+          <% countries.forEach(country => { %>
+            <option value="<%= country %>"><%= country %></option>
+          <% }); %>
+        </select>
+      </div>
+
+      <!-- Submit Button -->
+      <button type="submit" class="btn">Register</button>
+    </form>
+  </div>
+
+</body>
+<!-- ✅ Validation Script -->
+<script>
+  const form = document.querySelector("form");
+  const emailInput = form.querySelector('input[name="email"]');
+  const passwordInput = form.querySelector('input[name="password"]');
+  const confirmPasswordInput = form.querySelector('input[name="confirmPassword"]');
+
+  form.addEventListener("submit", function (e) {
+    const email = emailInput.value.trim();
+    const password = passwordInput.value;
+    const confirmPassword = confirmPasswordInput.value;
+
+    // ✅ Email must be in valid format
+    const emailPattern = /^[^@]+@[^@]+\.[a-z]{2,}$/i;
+    if (!emailPattern.test(email)) {
+      alert("Please enter a valid email address.");
+      e.preventDefault();
+      return;
+    }
+
+    // ✅ Password strength: 8+ chars, 1 uppercase, 1 lowercase, 1 number
+    const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+    if (!passwordPattern.test(password)) {
+      alert("Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, and one number.");
+      e.preventDefault();
+      return;
+    }
+
+    // ✅ Confirm password match
+    if (password !== confirmPassword) {
+      alert("Passwords do not match.");
+      e.preventDefault();
+    }
+  });
+</script>
+</html>

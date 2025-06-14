@@ -1,0 +1,67 @@
+<%- include("partials/header.ejs") %>
+
+<div class="container py-5 main">
+  <h1 class="text-center mb-4">Order History</h1>
+
+  <!-- Filters -->
+  <form method="GET" action="/history" class="row g-3 mb-4">
+    <div class="col-md-4">
+      <label for="startDate" class="form-label">Start Date</label>
+      <input type="date" name="start" id="startDate" class="form-control" value="<%= start || '' %>">
+    </div>
+    <div class="col-md-4">
+      <label for="endDate" class="form-label">End Date</label>
+      <input type="date" name="end" id="endDate" class="form-control" value="<%= end || '' %>">
+    </div>
+    <div class="col-md-4 d-flex align-items-end">
+      <button type="submit" class="btn btn-primary w-100">Filter</button>
+    </div>
+  </form>
+
+  <% if (orders.length > 0) { %>
+    <div class="d-flex justify-content-end mb-3">
+      <a href="/history/export/csv" class="btn btn-outline-success me-2">Export CSV</a>
+      <a href="/history/export/pdf" class="btn btn-outline-danger">Export PDF</a>
+    </div>
+
+    <div class="table-responsive shadow rounded">
+      <table class="table table-bordered table-hover align-middle bg-white">
+        <thead class="table-secondary">
+          <tr>
+            <th scope="col">Product</th>
+            <th scope="col">Image</th>
+            <th scope="col">Quantity</th>
+            <th scope="col">Total Price</th>
+            <th scope="col">Purchased At</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% orders.forEach(order => { %>
+            <tr>
+              <td class="fw-medium">
+                <a href="/product/<%= order.product_id %>"><%= order.product_name %></a>
+              </td>
+              <td>
+                <img src="<%= order.image_url %>" alt="Product Image" style="width: 60px; height: 60px; object-fit: cover;" class="rounded">
+              </td>
+              <td><%= order.quantity %></td>
+              <td>₦ <%= order.product_price.toLocaleString() %></td>
+              <td>
+                <%= new Date(order.purchased_at).toLocaleDateString() %>
+                <br>
+                <a href="/track-order/<%= order.tx_ref %>" class="btn btn-sm btn-outline-primary">Track Order</a>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+        
+      </table>
+    </div>
+  <% } else { %>
+    <div class="alert alert-warning text-center">
+      No orders found. Start shopping now!
+    </div>
+  <% } %>
+</div>
+
+<%- include("partials/footer.ejs") %>

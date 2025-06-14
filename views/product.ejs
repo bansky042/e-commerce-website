@@ -1,0 +1,100 @@
+<%- include("partials/header") %>
+
+<div class="container my-5">
+  <div class="row g-5">
+    <!-- Product Image -->
+    <div class="col-md-5">
+      <div class="border rounded shadow-sm p-3 bg-white">
+        <img src="<%= product.image_url %>" alt="<%= product.name %>" class="img-fluid rounded">
+      </div>
+    </div>
+
+    <!-- Product Info -->
+    <div class="col-md-7">
+      <div class="bg-white border rounded shadow-sm p-4 h-100 d-flex flex-column justify-content-between">
+        <div>
+          <h2 class="fw-bold mb-3"><%= product.name %></h2>
+          <p class="text-success fw-bold fs-4">₦<%= parseFloat(product.price).toLocaleString() %></p>
+          <p class="text-muted"><%= product.short_description || '' %></p>
+        </div>
+
+        <div class="mt-4">
+       
+          <form action="/add-to-cart" method="POST">
+            <input type="hidden" name="product_id" value="<%= product.id %>">
+            <button type="submit" class="btn btn-primary btn-lg w-100">Add to Cart</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Product Details Tabs -->
+  <div class="mt-5">
+    <h4 class="mb-4 fw-semibold">Product Details</h4>
+    
+    <ul class="nav nav-tabs" id="productTab" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="features-tab" data-bs-toggle="tab" data-bs-target="#features" type="button" role="tab">Key Features</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="specs-tab" data-bs-toggle="tab" data-bs-target="#specs" type="button" role="tab">Specifications</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="box-tab" data-bs-toggle="tab" data-bs-target="#box" type="button" role="tab">What's in the Box</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="summary-tab" data-bs-toggle="tab" data-bs-target="#summary" type="button" role="tab">Summary</button>
+      </li>
+    </ul>
+
+    <div class="tab-content border border-top-0 p-4 bg-white shadow-sm rounded-bottom" id="productTabContent">
+      
+      <!-- Key Features -->
+      <div class="tab-pane fade show active" id="features" role="tabpanel">
+        <% if (product.key_features?.length > 0) { %>
+          <ul class="list-group list-group-flush">
+            <% product.key_features.forEach(feature => { %>
+              <li class="list-group-item fs-5"><i class="bi bi-check-circle-fill text-success me-2"></i><%= feature %></li>
+            <% }) %>
+          </ul>
+        <% } else { %>
+          <p class="text-muted">No key features listed.</p>
+        <% } %>
+      </div>
+
+      <!-- Specifications -->
+      <div class="tab-pane fade" id="specs" role="tabpanel">
+        <% if (product.specifications?.length > 0) { %>
+          <ul class="list-group list-group-flush">
+            <% product.specifications.forEach(spec => { %>
+              <li class="list-group-item fs-5"><i class="bi bi-gear-fill text-primary me-2"></i><%= spec %></li>
+            <% }) %>
+          </ul>
+        <% } else { %>
+          <p class="text-muted">No specifications available.</p>
+        <% } %>
+      </div>
+
+      <!-- What's in the Box -->
+      <div class="tab-pane fade" id="box" role="tabpanel">
+        <% if (product.in_the_box?.length > 0) { %>
+          <ul class="list-group list-group-flush">
+            <% product.in_the_box.forEach(item => { %>
+              <li class="list-group-item fs-5"><i class="bi bi-box-seam text-warning me-2"></i><%= item %></li>
+            <% }) %>
+          </ul>
+        <% } else { %>
+          <p class="text-muted">No box contents listed.</p>
+        <% } %>
+      </div>
+
+      <!-- Summary -->
+      <div class="tab-pane fade" id="summary" role="tabpanel">
+        <p class="fs-5"><%= product.description || 'No additional summary available.' %></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include("partials/footer") %>

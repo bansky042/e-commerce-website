@@ -1,0 +1,39 @@
+<%- include("partials/header.ejs") %>
+
+<div class="container mt-5">
+  <h2><%= subCategory %> Products</h2>
+
+  <% if (products.length === 0) { %>
+    <p>No products found under <strong><%= subCategory %></strong>.</p>
+  <% } else { %>
+    <div class="product-grid">
+      <!-- Card 1 -->
+      <% products.forEach(product => { %>
+        <div class="section2-card">
+          <div class="section2-card-image"> 
+            <img src="<%= product.image_url %>" alt="<%= product.name %>" class="category-card-image2">
+          </div>
+          <div class="section2-card-text"> 
+            <p class="category-card-name"><%= product.name %></p>
+      
+            <!-- View Product Link -->
+            <a href="/product/<%= product.id %>" class="category-card-view-link">View Product</a>
+      
+            <p class="category-card-price">₦<%= parseFloat(product.price).toLocaleString() %></p>
+            <div class="category-card-ratings">★★★★☆</div>
+      
+            <form action="/add-to-cart" method="POST">
+              <input type="hidden" name="product_id" value="<%= product.id %>">
+              <button type="submit" class="category-card-button">Add to Cart</button>
+            </form>
+          </div>
+        </div>
+      <% }) %>
+      
+      </div>
+  <% } %>
+</div>
+
+<%- include("partials/footer.ejs") %>
+
+

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Make a Payment</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://js.stripe.com/v3/"></script>
+  <script src="https://www.paypal.com/sdk/js?client-id=YOUR_PAYPAL_CLIENT_ID"></script>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f9fafb;
+      padding: 40px;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    label {
+      display: block;
+      margin: 15px 0 5px;
+      font-weight: bold;
+    }
+
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      margin-bottom: 15px;
+    }
+
+    .method-section {
+      display: none;
+    }
+
+    .method-section.active {
+      display: block;
+    }
+
+    button {
+      background: #4f46e5;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: #4338ca;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Make a Payment</h2>
+
+    <form id="payment-form">
+      <label for="amount">Amount (NGN)</label>
+      <input type="number" id="amount" name="amount" value="<%= amount %>" step="0.01" readonly>
+
+      <label for="payment-method">Choose Method</label>
+      <select id="payment-method" name="method">
+        <option value="card">Card</option>
+        <option value="bank">Bank Transfer</option>
+        <option value="paypal">PayPal</option>
+      </select>
+
+      <!-- Card Section -->
+      <div class="method-section" id="card-section">
+        <label>Card Details</label>
+        <div id="card-element" style="padding:12px; border:1px solid #ccc; border-radius:8px;"></div>
+        <button type="submit" id="card-button">Pay with Card</button>
+      </div>
+
+      <!-- Bank Transfer Section -->
+      <div class="method-section" id="bank-section">
+        <p>Bank Account: 123456789 (ABC Bank)</p>
+        <label>Upload Proof</label>
+        <input type="file" name="proof" id="bank-proof" accept="image/*,.pdf">
+        <button type="submit">Submit Proof</button>
+      </div>
+
+      <!-- PayPal Section -->
+      <div class="method-section" id="paypal-section">
+        <div id="paypal-button-container"></div>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    const stripe = Stripe('<%= publishableKey %>');
+    const elements = stripe.elements();
+    const card = elements.create('card');
+    card.mount('#card-element');
+  
+    const methodSelect = document.getElementById('payment-method');
+    const sections = {
+      card: document.getElementById('card-section'),
+      bank: document.getElementById('bank-section'),
+      paypal: document.getElementById('paypal-section')
+    };
+  
+    function showSection(method) {
+      Object.values(sections).forEach(section => section.classList.remove('active'));
+      if (sections[method]) sections[method].classList.add('active');
+    }
+  
+    methodSelect.addEventListener('change', () => {
+      showSection(methodSelect.value);
+    });
+  
+    // Show default section
+    showSection(methodSelect.value);
+  
+    // --- CARD BUTTON HANDLER ONLY ---
+    const cardButton = document.getElementById('card-button');
+    cardButton.addEventListener('click', async (e) => {
+      e.preventDefault();
+      const amount = parseFloat(document.getElementById('amount').value);
+      const amountInCents = Math.round(amount * 100);
+  
+      const res = await fetch('/create-payment-intent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount: amountInCents })
+      });
+      const data = await res.json();
+  
+      const result = await stripe.confirmCardPayment(data.clientSecret, {
+        payment_method: { card }
+      });
+  
+      if (result.error) {
+        alert('Card payment failed: ' + result.error.message);
+      } else {
+        alert('Card payment successful!');
+        window.location.href = '/success';
+      }
+    });
+  
+    // --- FORM SUBMISSION FOR BANK ONLY ---
+    const form = document.getElementById('payment-form');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+  
+      const method = methodSelect.value;
+      if (method !== 'bank') return; // Prevent submitting form unless bank is selected
+  
+      const amount = parseFloat(document.getElementById('amount').value);
+      const file = document.getElementById('bank-proof').files[0];
+      if (!file) return alert('Please upload proof');
+  
+      const formData = new FormData();
+      formData.append('amount', amount);
+      formData.append('method', 'bank');
+      formData.append('proof', file);
+  
+      const res = await fetch('/submit-manual-payment', {
+        method: 'POST',
+        body: formData
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert('Proof submitted successfully!');
+        window.location.href = '/success';
+      } else {
+        alert('Error: ' + data.message);
+      }
+    });
+  
+    // --- PayPal Button ---
+    paypal.Buttons({
+      createOrder: (data, actions) => {
+        const amount = document.getElementById('amount').value;
+        return actions.order.create({
+          purchase_units: [{ amount: { value: amount } }]
+        });
+      },
+      onApprove: (data, actions) => {
+        return actions.order.capture().then(details => {
+          alert('PayPal Payment completed by ' + details.payer.name.given_name);
+          window.location.href = '/success';
+        });
+      },
+      onError: (err) => {
+        console.error(err);
+        alert('PayPal error');
+      }
+    }).render('#paypal-button-container');
+  </script>
+  
+</body>
+</html>
+

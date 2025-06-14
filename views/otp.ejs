@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>OTP Verification</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background-image: linear-gradient(to right, rgba(26, 0, 142, 0.658), rgba(129, 0, 0, 0.5)), url('/images/otp-background.jpg');
+      background-size: cover;
+      background-repeat: no-repeat;
+      min-height: 100vh;
+    }
+  </style>
+</head>
+
+<body class="flex items-center justify-center">
+  <div class="container mx-auto max-w-md bg-white p-8 rounded-lg shadow-lg">
+    <h2 class="text-2xl font-semibold text-center text-gray-800 mb-6">Enter OTP</h2>
+
+    <!-- Form starts -->
+    <form action="/verify-otp" method="POST" class="space-y-4">
+      <!-- Hidden Email Field -->
+      <input type="hidden" name="email" value="<%= email %>" />
+    
+      <!-- OTP Input Field -->
+      <div>
+        <label for="otp" class="block text-sm font-medium text-gray-600">OTP</label>
+        <input
+          type="text"
+          name="otp"
+          id="otp"
+          placeholder="Enter OTP"
+          required
+          class="mt-2 p-3 w-full border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+    
+      <div>
+        <button
+          type="submit"
+          class="w-full py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          Verify
+        </button>
+      </div>
+    </form>
+    
+
+    <!-- Optional error message from backend -->
+    <% if (typeof message !== "undefined") { %>
+      <div class="mt-4 text-red-500 text-center">
+        <p><%= message %></p>
+      </div>
+    <% } %>
+
+  </div>
+</body>
+</html>

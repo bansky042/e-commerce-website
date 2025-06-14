@@ -1,0 +1,40 @@
+<%- include("partials/header") %>
+
+<div class="container py-5">
+  <h2 class="mb-4">Search Results for "<%= query %>"</h2>
+
+  <% if (products.length === 0) { %>
+    <p class="text-muted">No products found.</p>
+  <% } else { %>
+    <div class="container">
+        <div class="row g-4">
+          <% products.forEach(product => { %>
+            <div class="col-6">
+                <div class="d-flex border rounded shadow-lg overflow-hidden bg-white" style="height: 200px;">
+                    <!-- Image on the left -->
+                    <div class="flex-shrink-0">
+                      <img src="<%= product.image_url %>" alt="<%= product.name %>" 
+                           class="h-100" style="width: 200px; object-fit: cover;">
+                    </div>
+                  
+                    <!-- Content on the right -->
+                    <div class="flex-grow-1 d-flex flex-column justify-content-between p-3 w-100">
+                      <div>
+                        <h5 class="mb-1 text-truncate"><%= product.name %></h5>
+                        <p class="fw-bold text-success mb-2">₦<%= product.price %></p>
+                      </div>
+                      <a href="/product/<%= product.id %>" class="btn btn-outline-primary align-self-start">View Product</a>
+                    </div>
+                  </div>
+                  
+                  
+            </div>
+          <% }) %>
+        </div>
+      </div>
+      
+      
+  <% } %>
+</div>
+
+<%- include("partials/footer") %>

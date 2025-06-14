@@ -1,0 +1,23 @@
+<%- include("partials/header.ejs") %>
+
+<div class="container mt-5">
+  <h2><%= mainCategory %> Subcategories</h2>
+
+  <% if (subcategories.length === 0) { %>
+    <p>No subcategories found for <strong><%= mainCategory %></strong>.</p>
+  <% } else { %>
+    <div class="row mt-4">
+      <% subcategories.forEach(sub => { %>
+        <div class="col-md-4 mb-3">
+          <a href="/products/<%= encodeURIComponent(mainCategory) %>/<%= encodeURIComponent(sub.second_category) %>" class="text-decoration-none">
+            <div class="card p-3 shadow-sm text-center">
+              <h5 class="text-dark"><%= sub.second_category %></h5>
+            </div>
+          </a>
+        </div>
+      <% }) %>
+    </div>
+  <% } %>
+</div>
+
+<%- include("partials/footer.ejs") %>

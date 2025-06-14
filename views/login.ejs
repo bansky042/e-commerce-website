@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login</title>
+
+  <!-- Inline Styles -->
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f7fc;
+    }
+
+    .container {
+      max-width: 400px;
+      margin: 100px auto;
+      padding: 30px;
+      background-color: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    }
+
+    .container h2 {
+      text-align: center;
+      font-size: 28px;
+      margin-bottom: 15px;
+      color: #333;
+    }
+
+    .container p {
+      text-align: center;
+      font-size: 14px;
+      margin-bottom: 25px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+      color: #555;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 10px 12px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      transition: border-color 0.3s ease;
+    }
+
+    .form-control:focus {
+      border-color: #007bff;
+      outline: none;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      background-color: navy;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .btn:hover {
+      background-color: red;
+    }
+
+    .forgot-password {
+      margin-top: 15px;
+      text-align: center;
+    }
+
+    .forgot-password a {
+      color: #007bff;
+      text-decoration: none;
+    }
+
+    .forgot-password a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 500px) {
+      .container {
+        margin: 50px 20px;
+        padding: 25px;
+      }
+
+      .container h2 {
+        font-size: 24px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <!-- Title -->
+    <h2>LOGIN</h2>
+    <p>Don't have an account? <a href="/register">Register</a></p>
+
+    <!-- Login Form -->
+    <form action="/login" method="POST">
+      <!-- Email Field -->
+      <div class="form-group">
+        <label for="username">Email</label>
+        <input type="email" class="form-control" name="username" placeholder="Enter your email address" required />
+      </div>
+
+      <!-- Password Field -->
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" class="form-control" name="password" placeholder="Enter your password" required />
+      </div>
+
+      <!-- Submit Button -->
+      <button type="submit" class="btn">Login</button>
+    </form>
+
+    <!-- Forgot Password Link -->
+    <div class="forgot-password">
+      <p>Forgotten your password? <a href="/forgottenpassword">Reset Password</a></p>
+    </div>
+  </div>
+</body>
+
+<!-- ✅ Validation Script -->
+<script>
+  const form = document.querySelector("form");
+  const emailInput = form.querySelector('input[name="email"]');
+  const passwordInput = form.querySelector('input[name="password"]');
+  
+  form.addEventListener("submit", function (e) {
+    const email = emailInput.value.trim();
+    const password = passwordInput.value;
+   
+
+    // ✅ Email must be in valid format
+    const emailPattern = /^[^@]+@[^@]+\.[a-z]{2,}$/i;
+    if (!emailPattern.test(email)) {
+      alert("Please enter a valid email address.");
+      e.preventDefault();
+      return;
+    }
+
+    // ✅ Password strength: 8+ chars, 1 uppercase, 1 lowercase, 1 number
+    const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+    if (!passwordPattern.test(password)) {
+      alert("Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, and one number.");
+      e.preventDefault();
+      return;
+    }
+
+    
+  });
+</script>
+
+</html>

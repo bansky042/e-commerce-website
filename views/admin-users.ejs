@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Dashboard - Users</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light text-dark">
+  <div class="container py-5">
+    <h1 class="mb-4 text-center fw-bold">User Management</h1>
+
+    <table class="table table-hover table-bordered" style="overflow-x: auto;">
+      <thead class="table-dark">
+        <tr>
+          <th>#</th>
+          <th>Full Name</th>
+          <th>Email</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% users.forEach((user, index) => { %>
+        <tr>
+          <td><%= index + 1 %></td>
+          <td><%= user.full_name %></td>
+          <td><%= user.email %></td>
+          <td><%= user.email_verified ? 'Active' : 'Blocked' %></td>
+          <td>
+            <form method="POST" action="/admin/users/<%= user.id %>/toggle" class="d-inline">
+              <button type="submit" class="btn btn-sm <%= user.email_verified ? 'btn-success' : 'btn-danger' %>">
+                <%= user.email_verified ? 'Blocked' : 'Unblocked' %>
+              </button>
+            </form>
+            <a href="/admin/users/<%= user.id %>" class="btn btn-sm btn-primary">View Orders</a>
+          </td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</body>
+</html>

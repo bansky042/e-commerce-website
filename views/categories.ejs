@@ -1,0 +1,18 @@
+<%- include("partials/header.ejs") %>
+
+<div class="container mt-5">
+  <h2>Main Categories</h2>
+  <div class="row mt-4">
+    <% categories.forEach(category => { %>
+      <div class="col-md-4 mb-3">
+        <a href="/category/<%= encodeURIComponent(category.name) %>" class="text-decoration-none">
+          <div class="card p-3 shadow-sm text-center">
+            <h5 class="text-dark"><%= category.name %></h5>
+          </div>
+        </a>
+      </div>
+    <% }) %>
+  </div>
+</div>
+
+<%- include("partials/footer.ejs") %>

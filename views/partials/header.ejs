@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.2/css/all.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    #loader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: white;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  
+    .spinner {
+      width: 3rem;
+      height: 3rem;
+      border: 0.5rem solid #ccc;
+      border-top-color: #007bff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+  
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+    .header-wrapper {
+  position: sticky;
+  top: 0;
+  left: 0;
+  width: 100%;
+  transform: translateY(-100px);
+  opacity: 0;
+  transition: transform 0.6s ease-out, opacity 0.6s ease-out;
+  z-index: 10000; /* High enough to overlay all */
+}
+
+main {
+  margin-top: 80px; /* or margin-top */
+}
+
+
+.header-wrapper.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+footer {
+    opacity: 0;
+    transform: translateY(100px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+
+  footer.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  </style>
+  
+
+
+  <link rel="stylesheet" href="/styles/style.css">
+  
+  <title>BanMarket</title>
+</head>
+
+<body>
+
+  <div id="loader">
+    <div class="spinner"></div>
+  </div>
+  <div class="header-wrapper">
+    <header class="header">
+
+        <nav class="navbar">
+
+            <a href="/" class="navbar-brand">
+                <h1 class="m-0 ">BanMarket</h1>
+            </a>
+
+            <div class="nav-search2 ms-auto"> 
+                
+                  
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+                  </svg>
+                <form action="/search" method="GET" class="d-flex">
+                    <input type="text" name="q" placeholder="Search..." class="nav-search " aria-label="Search">
+                    
+                    <button type="submit" class="search-btn">Search</button>
+                </form>
+            </div>
+
+            <div class="nav-menu navbar-icon ms-auto py-0 d-flex">
+
+                <div class="categories nav-item">
+                  <a href="/categories">
+                    <button  id="categoryToggle" class="category btn text-light" type="button">
+                      Categories
+                    </button>
+                  </a>
+                </div>
+                  
+
+                    <div class="flex  dropdown-toggle nav-item items-center space-x-2 cursor-pointer item2">
+                      <svg xmlns="http://www.w3.org/2000/svg" id="userDropdownToggle" width="35" height="25" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">
+                        <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
+                        <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"/>
+                      </svg>
+
+                      <% if (typeof user !== 'undefined') { %>
+                        <p class="user-name">Hi, <%= user.username %></p>
+                      <% } else { %>
+                        <p class="user-name">Hi, Guest</p>
+                        <% } %>
+
+                    
+                       <!-- Dropdown menu -->
+                  <ul id="userDropdownMenu" class="d-none dropdown-menu-custom" style="z-index: 100;">
+                    <li><a class="dropdown-item" href="/account" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">My Account</a></li>
+                    <li><a class="dropdown-item" href="/history" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">History</a></li>
+                    <li><a class="dropdown-item" href="/inbox" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Inbox</a></li>
+                    <li><a class="dropdown-item" href="/logout" class="block px-4 py-2 text-red-600 hover:bg-gray-100">Logout</a></li>
+                  </ul>
+                    </div>
+                 
+                   
+                 
+                   
+                    <a href="/cart">
+                <div class="nav-item item2">
+                
+                <svg  xmlns="http://www.w3.org/2000/svg" width="35" height="25" fill="currentColor" class="bi bi-cart2" viewBox="0 0 16 16">
+                    <path d="M0 2.5A.5.5 0 0 1 .5 2H2a.5.5 0 0 1 .485.379L2.89 4H14.5a.5.5 0 0 1 .485.621l-1.5 6A.5.5 0 0 1 13 11H4a.5.5 0 0 1-.485-.379L1.61 3H.5a.5.5 0 0 1-.5-.5M3.14 5l1.25 5h8.22l1.25-5zM5 13a1 1 0 1 0 0 2 1 1 0 0 0 0-2m-2 1a2 2 0 1 1 4 0 2 2 0 0 1-4 0m9-1a1 1 0 1 0 0 2 1 1 0 0 0 0-2m-2 1a2 2 0 1 1 4 0 2 2 0 0 1-4 0"/>
+                  </svg>
+                <p>cart</p>
+            
+                </div>
+              </a>
+
+            </div>
+
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </nav>
+
+        
+
+        <script>
+            document.getElementById('categoryToggle').addEventListener('click', function () {
+              const menu = document.getElementById('categoryMenu');
+              menu.classList.toggle('d-none');
+            });
+          
+            // Optional: Close menu when clicking outside
+            window.addEventListener('click', function (e) {
+              const toggleBtn = document.getElementById('categoryToggle');
+              const menu = document.getElementById('categoryMenu');
+              if (!toggleBtn.contains(e.target) && !menu.contains(e.target)) {
+                menu.classList.add('d-none');
+              }
+            });
+          </script>
+          
+          
+    </header>
+  </div>
+    <script>
+        document.getElementById('userDropdownToggle').addEventListener('click', function () {
+          const menu = document.getElementById('userDropdownMenu');
+          menu.classList.toggle('d-none');
+        });
+      
+        // Optional: Close menu when clicking outside
+        window.addEventListener('click', function (e) {
+          const toggleBtn = document.getElementById('userDropdownToggle');
+          const menu = document.getElementById('userDropdownMenu');
+          if (!toggleBtn.contains(e.target) && !menu.contains(e.target)) {
+            menu.classList.add('d-none');
+          }
+        });
+      </script>
+      
+      <script>
+        const hamburger = document.querySelector('.hamburger');
+        const navMenu = document.querySelector('.nav-menu');
+      
+        hamburger.addEventListener('click', () => {
+          hamburger.classList.toggle('active');
+          navMenu.classList.toggle('active');
+        });
+      
+        // Optional: Close menu when a nav-item is clicked
+        document.querySelectorAll('.nav-item').forEach(item =>
+          item.addEventListener('click', () => {
+            hamburger.classList.remove('active');
+          
+          })
+        );
+      </script>
+      
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3oAiTt6+G7I6t8e5c4z
++G7I6t8e5c4z+G7I6t8e5c4z+G7I6t8e5c4z+G7I6t8e5c4z" crossorigin="anonymous"></script>      

@@ -1,0 +1,30 @@
+<%- include("partials/header.ejs") %>
+
+<div class="container py-5">
+  <h2 class="text-center mb-4">Tracking Order: <%= tx_ref %></h2>
+
+  <div class="row d-flex justify-content-center">
+    <% orders.forEach(order => { %>
+      <div class="col-md-4 mb-4 ">
+        <div class="card shadow-sm p-3 h-100">
+          <img src="<%= order.image_url %>" alt="<%= order.product_name %>" class="card-img-top" style="max-height: 200px; object-fit: contain;">
+          <div class="card-body">
+            <h5 class="card-title"><%= order.product_name %></h5>
+            <p><strong>Quantity:</strong> <%= order.quantity %></p>
+            <p><strong>Price:</strong> ₦<%= parseFloat(order.price).toLocaleString() %></p>
+            <p><strong>Ordered On:</strong> <%= new Date(order.purchased_at).toLocaleDateString() %></p>
+          </div>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+
+  <hr class="my-4">
+
+  <div class="text-center">
+    <h4>Total Price for All Items: ₦<%= totalPrice.toLocaleString() %></h4>
+    <p class="mt-2">Estimated Delivery: <strong><%= new Date(estimatedArrival).toLocaleDateString() %></strong></p>
+  </div>
+</div>
+
+<%- include("partials/footer.ejs") %>

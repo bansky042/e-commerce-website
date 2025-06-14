@@ -1,0 +1,123 @@
+<%- include("partials/header.ejs") %>
+
+<div class="container my-5">
+  <div class="row g-4">
+    <!-- Cart Items Section -->
+    <div class="col-lg-8">
+      <div class="card shadow-sm border-0 p-4">
+        <h3 class="mb-4">Your Cart (<%= result.length %> item<%= result.length !== 1 ? 's' : '' %>)</h3>
+
+        <% if (result.length === 0) { %>
+          <p>Your cart is empty.</p>
+        <% } else { %>
+          <% result.forEach(item => { %>
+            <div class="row align-items-center mb-4">
+              <div class="col-md-4 text-center">
+                <img src="<%= item.image_url %>" alt="<%= item.name %>" class="img-fluid rounded" style="max-height: 200px;">
+              </div>
+              <div class="col-md-8">
+                <h5 class="fw-bold"><%= item.name %></h5>
+                <p class="text-muted mb-1">Qty: <%= item.quantity %></p>
+                <p class="h5 text-primary mb-3">₦<%= (item.product_price * item.quantity) %></p>
+
+                <div class="d-flex align-items-center gap-3 mb-3">
+                  <form action="/cart/decrease/<%= item.product_id %>" method="POST">
+                    <button class="btn btn-outline-secondary btn-sm">-</button>
+                  </form>
+                  <span class="fs-5"><%= item.quantity %></span>
+                  <form action="/cart/increase/<%= item.product_id %>" method="POST">
+                    <button class="btn btn-outline-secondary btn-sm">+</button>
+                  </form>
+                </div>
+                
+                <form action="/cart/remove/<%= item.product_id %>" method="POST">
+                  <button class="btn btn-outline-danger btn-sm">Remove</button>
+                </form>
+                
+              </div>
+            </div>
+          <% }) %>
+        <% } %>
+      </div>
+    </div>
+
+    <!-- Cart Summary Section -->
+    <div class="col-lg-4">
+      <div class="card shadow-sm border-0 p-4">
+        <h4 class="mb-4">Cart Summary</h4>
+
+        <div class="d-flex justify-content-between mb-3">
+          <span>Subtotal</span>
+          <span>₦<%= subtotal %></span>
+        </div>
+
+        <div class="d-flex justify-content-between mb-4">
+          <span>Shipping</span>
+          <span>₦<%= shipping %></span>
+        </div>
+
+        <div class="d-flex justify-content-between fw-bold mb-4">
+          <span>Total</span>
+          <span>₦<%= total %></span>
+        </div>
+
+        <div class="d-grid gap-2">
+          <button onclick="makePayment()" class="btn btn-primary">Proceed to Checkout</button>
+          <a href="/" class="btn btn-outline-primary">Continue Shopping</a>
+          <form action="/cart/clear" method="POST">
+            <button class="btn btn-outline-danger">Clear Cart</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Flutterwave Script -->
+<script src="https://checkout.flutterwave.com/v3.js"></script>
+<script>
+  function makePayment() {
+    const tx_ref = "TX-" + Date.now();
+    
+    FlutterwaveCheckout({
+      public_key: "FLWPUBK_TEST-639a874a89faeee1bad25670aaaccdf9-X",
+      tx_ref,
+      amount: "<%= total %>",
+      currency: "NGN",
+      payment_options: "card,banktransfer,ussd",
+      customer: {
+        email: "<%= user.email %>",
+        phone_number: "<%= user.phone %>",
+        name: "<%= user.name %>"
+      },
+      customizations: {
+        title: "BanMarket Checkout",
+        description: "Payment for items in your cart",
+        logo: "https://st2.depositphotos.com/4403291/7418/v/450/depositphotos_74189661-stock-illustration-online-shop-log.jpg"
+      },
+      callback: function(response) {
+        // send tx_ref to backend to process order
+        fetch("/payment-success", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ tx_ref })
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            window.location.href = "/success";
+          } else {
+            alert("Error processing order. Contact support.");
+          }
+        });
+      },
+      onclose: function() {
+        alert("Payment closed.");
+      }
+    });
+  }
+</script>
+
+
+
+<%- include("partials/footer.ejs") %>
