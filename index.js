@@ -7,7 +7,7 @@ const passport = require("passport");
 const { Strategy } = require("passport-local");
 const session = require("express-session");
 const cookieParser = require('cookie-parser');
-const Stripe = require('stripe');
+
 const cors = require('cors');
 const dotenv = require('dotenv');
 const nodemailer = require('nodemailer');
@@ -18,7 +18,7 @@ const app = express();
 const port = 3000;
 const saltRounds = 10;
 
-const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
+
 
 // Middleware
 app.use(cors());
@@ -808,7 +808,7 @@ app.get('/payment/:amount',isLoggedIn, emailVerified, (req, res) => {
   }
 
   const flutterwaveConfig = {
-    public_key: 'FLWPUBK_TEST-639a874a89faeee1bad25670aaaccdf9-X',
+    public_key: process.env.FLUTTERWAVE_PUBLIC_KEY,
     tx_ref: `TX-${Date.now()}`,
     amount: amount,
     currency: 'NGN',
