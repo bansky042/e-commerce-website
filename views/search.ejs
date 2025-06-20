@@ -9,7 +9,7 @@
     <div class="container">
         <div class="row g-4">
           <% products.forEach(product => { %>
-            <div class="col-6">
+            <div class="col-sm-12">
                 <div class="d-flex border rounded shadow-lg overflow-hidden bg-white" style="height: 200px;">
                     <!-- Image on the left -->
                     <div class="flex-shrink-0">
@@ -20,7 +20,7 @@
                     <!-- Content on the right -->
                     <div class="flex-grow-1 d-flex flex-column justify-content-between p-3 w-100">
                       <div>
-                        <h5 class="mb-1 text-truncate"><%= product.name %></h5>
+                        <h5 class="mb-1 text-truncate" style="text-wrap: wrap;"><%= product.name %></h5>
                         <p class="fw-bold text-success mb-2">₦<%= product.price %></p>
                       </div>
                       <a href="/product/<%= product.id %>" class="btn btn-outline-primary align-self-start">View Products</a>

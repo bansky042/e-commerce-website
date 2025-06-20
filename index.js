@@ -73,8 +73,13 @@ function isLoggedIn(req, res, next) {
   if (req.isAuthenticated()) {
     return next();
   }
+
+  console.log("Saving return URL:", req.originalUrl);
+  req.session.returnTo = req.originalUrl;
   res.redirect("/login");
 }
+
+
 
 function isadmin(req, res, next) {
   if (req.isAuthenticated() && req.user.is_admin === true) {
@@ -91,7 +96,7 @@ function emailVerified(req, res, next) {
 }
 
 // Routes
-app.get("/", emailVerified, isLoggedIn, async (req, res) => {
+app.get("/", async (req, res) => {
   
   try {
     const result = await pool.query("SELECT * FROM products ORDER BY created_at DESC");
@@ -169,6 +174,19 @@ app.post("/admin/products", isadmin, upload.single("image"), async (req, res) =>
 
   const image_url = `/uploads/${req.file.filename}`;
 
+  // Convert comma-separated strings to arrays, trimming whitespace
+  const keyFeaturesArray = key_features
+    ? key_features.split(",").map(f => f.trim())
+    : [];
+
+  const specificationsArray = specifications
+    ? specifications.split(",").map(s => s.trim())
+    : [];
+
+  const inTheBoxArray = in_the_box
+    ? in_the_box.split(",").map(i => i.trim())
+    : [];
+
   try {
     await pool.query(
       `INSERT INTO products (
@@ -192,20 +210,32 @@ app.post("/admin/products", isadmin, upload.single("image"), async (req, res) =>
         price,
         short_description,
         description,
-        key_features,
-        specifications,
-        in_the_box,
+        keyFeaturesArray,
+        specificationsArray,
+        inTheBoxArray,
         stock
       ]
     );
-    res.redirect("/",{
-      user: req.user
+    console.log("Product inserted successfully:", {
+      first_category,
+      second_category,
+      name,
+      price,
+      short_description,
+      description,
+      keyFeaturesArray,
+      specificationsArray,
+      inTheBoxArray,
+      stock
     });
+    console.log("Image URL:", image_url);
+    res.redirect("/");
   } catch (err) {
     console.error("Error inserting product:", err);
     res.status(500).send("Failed to add product.");
   }
 });
+
 
 
 
@@ -320,7 +350,7 @@ app.post('/admin/users/:userId/orders/:orderId/update', isadmin, async (req, res
 
 
 
-app.get('/categories', async (req, res) => {
+app.get('/categories', isLoggedIn, emailVerified, async (req, res) => {
   if(!req.isAuthenticated()) {
     return res.redirect('/login');
   }
@@ -336,7 +366,7 @@ app.get('/categories', async (req, res) => {
   }
 });
 
-app.get('/category/:mainCategory', async (req, res) => {
+app.get('/category/:mainCategory', isLoggedIn, emailVerified, async (req, res) => {
   if(!req.isAuthenticated()) {
     return res.redirect('/login');
   }
@@ -360,7 +390,7 @@ app.get('/category/:mainCategory', async (req, res) => {
 
   
 
-app.get('/products/:mainCategory/:subCategory', async (req, res) => {
+app.get('/products/:mainCategory/:subCategory', isLoggedIn,emailVerified, async (req, res) => {
   if(!req.isAuthenticated()) {
     return res.redirect('/login');
   }
@@ -380,7 +410,7 @@ app.get('/products/:mainCategory/:subCategory', async (req, res) => {
   }
 });
 
-app.get("/product/:id", async (req, res) => {
+app.get("/product/:id",isLoggedIn,emailVerified, async (req, res) => {
   const { id } = req.params;
   try {
     const { rows } = await pool.query("SELECT * FROM products WHERE id = $1", [id]);
@@ -388,7 +418,9 @@ app.get("/product/:id", async (req, res) => {
 
 
    
-    res.render("product", { product });
+    res.render("product", { product,
+      user:req.user
+     });
   } catch (err) {
     console.error("Error fetching product:", err);
     res.redirect("/");
@@ -396,7 +428,7 @@ app.get("/product/:id", async (req, res) => {
 });
 
 
-app.get('/account', async (req, res) => {
+app.get('/account', isLoggedIn, emailVerified, async (req, res) => {
   const userId = req.user.id;
 
   try {
@@ -423,30 +455,13 @@ app.get('/account', async (req, res) => {
       LIMIT 3
     `, [userId]);
 
-    // ✅ Get total monthly sales from all users (Jan - Dec)
-    const monthlySalesQuery = await pool.query(`
-      SELECT 
-        EXTRACT(MONTH FROM purchased_at) AS month,
-        SUM(price) AS total_sales
-      FROM order_history
-      WHERE EXTRACT(YEAR FROM purchased_at) = EXTRACT(YEAR FROM CURRENT_DATE)
-      GROUP BY month
-      ORDER BY month
-    `);
-      console.log('Monthly sales query result:', monthlySalesQuery.rows);
-    // Fill array with 12 months, default 0
-    const salesByMonth = Array(12).fill(0);
-    monthlySalesQuery.rows.forEach(row => {
-      salesByMonth[row.month - 1] = parseFloat(row.total_sales);
- 
-    });
-    console.log('Sales by month:', salesByMonth);
+   
     // Render EJS view with all data
     res.render('account', {
       user,
       totalOrders,
       recentProducts: recentOrders.rows,
-      salesByMonth// pass to line chart
+     
     });
 
   } catch (err) {
@@ -484,7 +499,7 @@ app.get("/cont", (req, res) => {
 });
 
 
-app.get("/search", async (req, res) => {
+app.get("/search",isLoggedIn,emailVerified, async (req, res) => {
   const query = req.query.q?.trim().toLowerCase() || "";
 
   if (!query) {
@@ -507,7 +522,7 @@ app.get("/search", async (req, res) => {
 
 // In your routes/index.js or a separate history.js file
 
-app.get('/history', async (req, res) => {
+app.get('/history', isLoggedIn, emailVerified, async (req, res) => {
   try {
     const userId = req.user.id;
     const start = req.query.start || '';
@@ -558,7 +573,7 @@ app.get('/history', async (req, res) => {
 });
 
 // GET route for tracking order
-app.get('/track-order/:tx_ref', async (req, res) => {
+app.get('/track-order/:tx_ref', isLoggedIn, emailVerified, async (req, res) => {
   const { tx_ref } = req.params;
   const user = req.user;
   if (!user) {
@@ -606,7 +621,7 @@ app.get('/track-order/:tx_ref', async (req, res) => {
 
 
 
-app.get('/cart', async (req, res) => {
+app.get('/cart',isLoggedIn, emailVerified, async (req, res) => {
   if(!req.isAuthenticated()) {
     return res.redirect('/login');
   }
@@ -762,9 +777,17 @@ app.get("/logout", (req, res) => {
 });
 
 app.post("/login", passport.authenticate("local", {
-  successRedirect: "/",
   failureRedirect: "/login",
-}));
+  failureFlash: true
+}), (req, res) => {
+  console.log("Session content after login:", req.session);
+  const redirectTo = req.session.returnTo || "/";
+  console.log("Redirecting to:", redirectTo);
+  delete req.session.returnTo;
+  res.redirect(redirectTo);
+});
+
+
 
 
 
@@ -775,11 +798,8 @@ app.post("/login", passport.authenticate("local", {
 
 
 // GET /payment - Show flutterwave payment or manual form
-app.get('/payment/:amount', (req, res) => {
-  if (!req.isAuthenticated()) {
-    return res.redirect('/login');
-  }
-
+app.get('/payment/:amount',isLoggedIn, emailVerified, (req, res) => {
+  
   const rawAmount = req.params.amount;
   const amount = parseFloat(rawAmount);
 
