@@ -80,7 +80,7 @@
     const tx_ref = "TX-" + Date.now();
     
     FlutterwaveCheckout({
-      public_key: "FLWPUBK_TEST-639a874a89faeee1bad25670aaaccdf9-X",
+      public_key: "<%=publicKey %>",
       tx_ref,
       amount: "<%= total %>",
       currency: "NGN",
@@ -93,7 +93,7 @@
       customizations: {
         title: "BanMarket Checkout",
         description: "Payment for items in your cart",
-        logo: "https://pin.it/6gQO3jTXA"
+        logo: "https://i.pinimg.com/736x/f8/3b/ea/f83bea34643e1e37a96be28e9d5b7499.jpg"
       },
       callback: function(response) {
         // send tx_ref to backend to process order

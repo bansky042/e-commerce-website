@@ -617,6 +617,9 @@ app.get('/track-order/:tx_ref', isLoggedIn, emailVerified, async (req, res) => {
 });
 
 
+app.get("/flutterwave-key", (req, res) => {
+  res.json({ publicKey: process.env.FLUTTERWAVE_PUBLIC_KEY });
+});
 
 
 
@@ -646,7 +649,10 @@ console.log(result);
     const shipping = 2000; // Flat shipping rate
     const total = subtotal + shipping;
 
-    res.render('cart', { result, subtotal, shipping, total, user:req.user });
+   const publicKey = process.env.FLUTTERWAVE_PUBLIC_KEY;
+    console.log('Public Key:', publicKey);
+
+    res.render('cart', { result, subtotal, shipping, total, user:req.user, publicKey });
 
   } catch (err) {
     console.error('Error fetching cart:', err);
@@ -778,7 +784,7 @@ app.get("/logout", (req, res) => {
 
 app.post("/login", passport.authenticate("local", {
   failureRedirect: "/login",
-  failureFlash: true
+  failureFlash: false // optional since it's false by default
 }), (req, res) => {
   console.log("Session content after login:", req.session);
   const redirectTo = req.session.returnTo || "/";
@@ -825,7 +831,7 @@ app.get('/payment/:amount',isLoggedIn, emailVerified, (req, res) => {
     }
   };
 
-  res.render('payment', { flutterwaveConfig });
+  res.render('payment', { flutterwaveConfig, publicKey: process.env.FLUTTERWAVE_PUBLIC_KEY });
 });
 
 app.post('/payment-success', async (req, res) => {
