@@ -7,6 +7,7 @@ const passport = require("passport");
 const { Strategy } = require("passport-local");
 const session = require("express-session");
 const cookieParser = require('cookie-parser');
+const { upload } = require('./cloudinary'); 
 
 const cors = require('cors');
 const dotenv = require('dotenv');
@@ -44,27 +45,22 @@ app.use(passport.session());
 
 // PostgreSQL Pool
 const pool = new Pool({
-  user: process.env.POSTGRES_USER || "postgres",
-  host: process.env.POSTGRES_HOST || "localhost",
-  database: process.env.POSTGRES_DB || "e-commerce",
-  password: process.env.POSTGRES_PASSWORD || "bansky@100",
-  port: process.env.POSTGRES_PORT || 5432,
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false, // required by some providers
+  }
 });
 
 // Multer Setup (for local file upload)
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, "public/uploads"),
-  filename: (req, file, cb) =>
-    cb(null, Date.now() + path.extname(file.originalname)),
-});
 
 
-const upload = multer({ storage });
+
+const adminEmail = process.env.ADMIN_EMAIL;
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: "abanakosisochukwu03@gmail.com",
+    user: adminEmail,
     pass: "lkwe ehad ybwd kcbg",
   },
 });
@@ -641,16 +637,17 @@ app.get('/cart',isLoggedIn, emailVerified, async (req, res) => {
 
     const result = dbCheck.rows;
 console.log(result);
+const publicKey = process.env.FLUTTERWAVE_PUBLIC_KEY;
+console.log('Public Key:', publicKey);
     if (result.length === 0) {
-      return res.render('cart', { result: [], subtotal: 0, shipping: 0, total: 0, user:req.user });
+      return res.render('cart', { result: [], subtotal: 0, shipping: 0, total: 0, user:req.user, publicKey });
     }
     // Calculate subtotal
     const subtotal = result.reduce((sum, item) => sum + item.product_price * item.quantity, 0);
     const shipping = 2000; // Flat shipping rate
     const total = subtotal + shipping;
 
-   const publicKey = process.env.FLUTTERWAVE_PUBLIC_KEY;
-    console.log('Public Key:', publicKey);
+  
 
     res.render('cart', { result, subtotal, shipping, total, user:req.user, publicKey });
 
