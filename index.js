@@ -92,7 +92,7 @@ function emailVerified(req, res, next) {
 }
 
 // Routes
-app.get("/", async (req, res) => {
+app.get("/",isLoggedIn, async (req, res) => {
   
   try {
     const result = await pool.query("SELECT * FROM products ORDER BY created_at DESC");
@@ -1200,14 +1200,19 @@ passport.serializeUser((user, cb) => {
   cb(null, user.id); // Store only the user ID
 });
 
-passport.deserializeUser(async (id, cb) => {
+passport.deserializeUser(async (id, done) => {
   try {
     const result = await pool.query("SELECT * FROM userss WHERE id = $1", [id]);
-    cb(null, result.rows[0]);
+    if (result.rows.length > 0) {
+      done(null, result.rows[0]);
+    } else {
+      done(null, false); // User not found
+    }
   } catch (err) {
-    cb(err);
+    done(err, null); // Pass error to Passport
   }
 });
+
 
 
 // Start Server
