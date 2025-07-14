@@ -25,4 +25,3 @@ module.exports = {
   cloudinary,
   upload
 };
-n
