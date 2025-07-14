@@ -2,7 +2,7 @@
 require('dotenv').config(); // ← Add this at the top
 const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
-
+// Ensure you have installed the required packages:
 // Configure your Cloudinary credentials
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -25,3 +25,4 @@ module.exports = {
   cloudinary,
   upload
 };
+n
