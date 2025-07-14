@@ -96,7 +96,7 @@ app.get("/", async (req, res) => {
   
   try {
     const result = await pool.query("SELECT * FROM products ORDER BY created_at DESC");
-    const user = await pool.query("SELECT * FROM users WHERE id = $1", [req.session.passport.user]);
+    const user = await pool.query("SELECT * FROM userss WHERE id = $1", [req.session.passport.user]);
     const userData = user.rows[0];
     console.log(userData);
     res.render("index.ejs", { products: result.rows, user: userData });
@@ -117,11 +117,11 @@ app.get('/admin', isadmin, (req, res) => {
 
 
 app.get('/admin/dashboard', isadmin, async (req, res) => {
-  const result = await pool.query("SELECT * FROM users");
+  const result = await pool.query("SELECT * FROM userss ");
 const users = result.rows; // ✅ This must be an array
 
   try {
-    const totalUsersResult = await pool.query(`SELECT COUNT(*) FROM users`);
+    const totalUsersResult = await pool.query(`SELECT COUNT(*) FROM userss`);
     const totalUsers = parseInt(totalUsersResult.rows[0].count, 10);
 
     const totalRevenueResult = await pool.query(`SELECT COALESCE(SUM(price), 0) AS total FROM order_history`);
@@ -239,11 +239,11 @@ app.post("/admin/products", isadmin, upload.single("image"), async (req, res) =>
 app.post("/admin/dashboard/:id/block", isadmin, async (req, res) => {
   const userId = req.params.id;
   try {
-    const user = await pool.query("SELECT email_verified FROM users WHERE id = $1", [userId]);
+    const user = await pool.query("SELECT email_verified FROM userss WHERE id = $1", [userId]);
     if (user.rows.length === 0) return res.status(404).send("User not found");
 
     const newStatus = !user.rows[0].is_blocked;
-    await pool.query("UPDATE users SET email_verified = $1 WHERE id = $2", [newStatus, userId]);
+    await pool.query("UPDATE userss SET email_verified = $1 WHERE id = $2", [newStatus, userId]);
     res.redirect("/admin/dashboard");
   } catch (err) {
     console.error("Error updating user block status:", err);
@@ -258,14 +258,14 @@ app.post("/admin/dashboard/:id/toggle", isadmin, async (req, res) => {
 
   try {
     // Get current block status
-    const result = await pool.query("SELECT email_verified FROM users WHERE id = $1", [userId]);
+    const result = await pool.query("SELECT email_verified FROM userss WHERE id = $1", [userId]);
 
     if (result.rows.length === 0) return res.status(404).send("User not found");
 
     const isBlocked = result.rows[0].email_verified;
 
     // Toggle status
-    await pool.query("UPDATE users SET email_verified = $1 WHERE id = $2", [!isBlocked, userId]);
+    await pool.query("UPDATE userss SET email_verified = $1 WHERE id = $2", [!isBlocked, userId]);
 
     res.redirect("/admin/dashboard"); // or send JSON: res.json({ success: true })
   } catch (err) {
@@ -283,7 +283,7 @@ app.get('/admin/users/:id', isadmin, async (req, res) => {
   const userId = req.params.id;
 
   try {
-    const userQuery = await pool.query('SELECT * FROM users WHERE id = $1', [userId]);
+    const userQuery = await pool.query('SELECT * FROM userss WHERE id = $1', [userId]);
     const user = userQuery.rows[0];
 
     const ordersQuery = await pool.query(`
@@ -429,7 +429,7 @@ app.get('/account', isLoggedIn, emailVerified, async (req, res) => {
 
   try {
     // Fetch user data
-    const userQuery = await pool.query('SELECT * FROM users WHERE id = $1', [userId]);
+    const userQuery = await pool.query('SELECT * FROM userss WHERE id = $1', [userId]);
     const user = userQuery.rows[0];
 
     // Get total number of orders by user
@@ -477,7 +477,7 @@ app.patch('/update-address', async (req, res) => {
 
   try {
     await pool.query(
-      'UPDATE users SET address = $1, phone_number = $2 WHERE id = $3',
+      'UPDATE userss SET address = $1, phone_number = $2 WHERE id = $3',
       [address, phone_number, userId]
     );
     console.log('Address updated for user:', userId);
@@ -947,7 +947,7 @@ app.post("/forgottenpassword", async (req, res) => {
   // Send OTP via email
   
   const mailOptions = {
-    from: "abanakosisochukwu03@gmail.com",
+    from: adminEmail,
     to: email,
     subject: 'Your OTP Code',
     text: `Your OTP code is ${otp}`,
@@ -991,7 +991,7 @@ app.post("/forgotpassword", async (req, res, next) => {
     const newPassword = req.body.newPassword;
 
     // Check if user exists
-    const userCheck = await pool.query("SELECT * FROM users WHERE LOWER(email) = $1", [email]);
+    const userCheck = await pool.query("SELECT * FROM userss WHERE LOWER(email) = $1", [email]);
 
     if (userCheck.rows.length === 0) {
       return res.status(404).send("User not found");
@@ -1001,7 +1001,7 @@ app.post("/forgotpassword", async (req, res, next) => {
 
     // Update password
     const result = await pool.query(
-      "UPDATE users SET password = $1 WHERE email = $2 RETURNING *", 
+      "UPDATE userss SET password = $1 WHERE email = $2 RETURNING *", 
       [hashedPassword, email]
     );
 
@@ -1049,7 +1049,7 @@ app.post("/register", async (req, res) => {
 
   try {
     // Check if email already exists
-    const userExists = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
+    const userExists = await pool.query("SELECT * FROM userss WHERE email = $1", [email]);
     if (userExists.rows.length > 0) {
       return res.send("Email already exists.");
     }
@@ -1059,7 +1059,7 @@ app.post("/register", async (req, res) => {
 
     // Create user
     const result = await pool.query(
-      `INSERT INTO users (
+      `INSERT INTO userss (
         full_name, username, email, password, phone_number, country,
         address, city, state, postal_code, otp_code, otp_created_at
       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
@@ -1085,7 +1085,7 @@ app.post("/register", async (req, res) => {
 
     // Send OTP via email
     const mailOptions = {
-      from: "abanakosisochukwu03@gmail.com",
+      from: adminEmail,
       to: email,
       subject: "OTP to complete your registration",
       html: `
@@ -1115,7 +1115,7 @@ app.get("/verify-otps", async (req, res) => {
   const userId = req.session.tempUserId;
   if (!userId) return res.redirect("/register");
 
-  const result = await pool.query("SELECT email FROM users WHERE id = $1", [userId]);
+  const result = await pool.query("SELECT email FROM userss WHERE id = $1", [userId]);
   const user = result.rows[0];
 
   res.render("verify-otp", {
@@ -1133,7 +1133,7 @@ app.post("/verify-otps", async (req, res) => {
   if (!userId) return res.redirect("/register");
 
   try {
-    const result = await pool.query("SELECT * FROM users WHERE id = $1", [userId]);
+    const result = await pool.query("SELECT * FROM userss WHERE id = $1", [userId]);
     const user = result.rows[0];
 
     if (!user?.otp_code || !user.otp_created_at) {
@@ -1152,7 +1152,7 @@ app.post("/verify-otps", async (req, res) => {
 
     if (!isExpired && isMatch) {
       await pool.query(
-        "UPDATE users SET email_verified = true, otp_code = null, otp_created_at = null WHERE id = $1",
+        "UPDATE userss SET email_verified = true, otp_code = null, otp_created_at = null WHERE id = $1",
         [userId]
       );
 
@@ -1183,7 +1183,7 @@ app.post("/verify-otps", async (req, res) => {
 
 passport.use(new Strategy(async (username, password, cb) => {
   try {
-    const result = await pool.query("SELECT * FROM users WHERE email = $1", [username]);
+    const result = await pool.query("SELECT * FROM userss WHERE email = $1", [username]);
     if (result.rows.length === 0) return cb(null, false, { message: "User not found" });
 
     const user = result.rows[0];
@@ -1202,7 +1202,7 @@ passport.serializeUser((user, cb) => {
 
 passport.deserializeUser(async (id, cb) => {
   try {
-    const result = await pool.query("SELECT * FROM users WHERE id = $1", [id]);
+    const result = await pool.query("SELECT * FROM userss WHERE id = $1", [id]);
     cb(null, result.rows[0]);
   } catch (err) {
     cb(err);
