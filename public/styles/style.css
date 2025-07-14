@@ -697,14 +697,13 @@ a {
   .gradient-overlay2 {
     position: absolute;
     top: 0;
-    left: 13px;
-    width: 100%;
+    left: 15px;
+    width: 90%;
     height: 100%;
-    background: linear-gradient(to right, rgba(0,0,0,0.7), rgba(0,0,0,0));
+    background: linear-gradient(to right, rgba(0, 0, 0, 0.634), rgba(0,0,0,0));
     z-index: 1;
     border-radius: 30px;
   }
-  
   .custom-start-20 {
     left: 6%;
   }
