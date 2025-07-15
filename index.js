@@ -92,7 +92,7 @@ function emailVerified(req, res, next) {
 }
 
 // Routes
-app.get("/",isLoggedIn, async (req, res) => {
+app.get("/", async (req, res) => {
   
   try {
     const result = await pool.query("SELECT * FROM products ORDER BY created_at DESC");
